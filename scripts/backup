@@ -1,0 +1,13 @@
+#!/bin/bash
+
+source ../settings/scripts/_common.sh
+source /usr/share/yunohost/helpers
+
+ynh_print_info "Declaring files to be backed up..."
+
+ynh_backup "/etc/nginx/conf.d/$domain.d/$app.conf"
+ynh_backup "/etc/nginx/conf.d/${app}_gate_map.conf"
+ynh_backup "$install_dir/www"
+ynh_backup "$install_dir/conf"
+
+ynh_print_info "Backup of $app completed"

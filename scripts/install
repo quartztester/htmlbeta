@@ -1,0 +1,46 @@
+#!/bin/bash
+
+source _common.sh
+source /usr/share/yunohost/helpers
+
+#=================================================
+# INSTALL
+#=================================================
+ynh_script_progression "Setting up the gallery..."
+
+# Gate hash is fixed at package level (sha256 of the gate word, 40 hex chars)
+gate_hash=$(cat ../sources/gate_hash.txt)
+ynh_app_setting_set --key=gate_hash --value="$gate_hash"
+
+# Static site files
+ynh_safe_rm "$install_dir/www"
+mkdir -p "$install_dir/www"
+cp -a ../sources/www/. "$install_dir/www/"
+chown -R "$app:" "$install_dir/www"
+find "$install_dir/www" -type f -exec chmod 644 {} \;
+find "$install_dir/www" -type d -exec chmod 755 {} \;
+# nginx (www-data) must traverse the app-owned install dir
+chgrp -R www-data "$install_dir"
+chmod g+x "$install_dir" "$install_dir/www"
+
+# Gate hash copy for backup/restore reference
+mkdir -p "$install_dir/conf"
+printf 'GATE_HASH=%s\n' "$gate_hash" > "$install_dir/conf/gate.env"
+chown "$app:www-data" "$install_dir/conf/gate.env"
+chmod 640 "$install_dir/conf/gate.env"
+
+# http-level cookie map (rendered with the hash; included from nginx.conf)
+mkdir -p /etc/nginx/conf.d
+sed "s|__GATE_HASH__|$gate_hash|g" ../conf/nginx-map.conf > /etc/nginx/conf.d/${app}_gate_map.conf
+chown root:www-data /etc/nginx/conf.d/${app}_gate_map.conf
+
+# Per-domain server block (root installs: __PATH__ -> empty, matching YNH's nginx helper)
+mkdir -p /etc/nginx/conf.d/$domain.d
+if [ "$path" = "/" ]; then path_sed=""; else path_sed="$path"; fi
+sed "s|__PATH__|$path_sed|g; s|__INSTALL_DIR__|$install_dir|g" ../conf/nginx.conf \
+  > /etc/nginx/conf.d/$domain.d/$app.conf
+chown root:www-data /etc/nginx/conf.d/$domain.d/$app.conf
+
+ynh_systemctl --service=nginx --action="reload"
+
+ynh_script_progression "Installation of $app completed"

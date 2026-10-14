@@ -1,0 +1,45 @@
+#!/bin/bash
+
+source _common.sh
+source /usr/share/yunohost/helpers
+
+#=================================================
+# UPGRADE
+#=================================================
+ynh_script_progression "Upgrading $app..."
+
+# Static site files
+# Personal media (photos/clips) is not shipped in the repo; keep the deployed copies
+media_tmp=""
+if [ -d "$install_dir/www/photos" ] && [ ! -d ../sources/www/photos ]; then
+    media_tmp=$(mktemp -d "$install_dir/media.XXXXXX")
+    mv "$install_dir/www/photos" "$install_dir/www/clips" "$media_tmp/" 2>/dev/null || true
+fi
+
+ynh_safe_rm "$install_dir/www"
+mkdir -p "$install_dir/www"
+cp -a ../sources/www/. "$install_dir/www/"
+
+if [ -n "$media_tmp" ]; then
+    rm -rf "$install_dir/www/photos" "$install_dir/www/clips"
+    mv "$media_tmp/photos" "$media_tmp/clips" "$install_dir/www/" 2>/dev/null || true
+    ynh_safe_rm "$media_tmp"
+fi
+chown -R "$app:" "$install_dir/www"
+find "$install_dir/www" -type f -exec chmod 644 {} \;
+find "$install_dir/www" -type d -exec chmod 755 {} \;
+# nginx (www-data) must traverse the app-owned install dir
+chgrp -R www-data "$install_dir"
+chmod g+x "$install_dir" "$install_dir/www"
+
+# Re-render the nginx gate conf from the stored hash (password unchanged)
+gate_hash=$(ynh_app_setting_get --key=gate_hash)
+sed "s|__GATE_HASH__|$gate_hash|g" ../conf/nginx-map.conf > /etc/nginx/conf.d/${app}_gate_map.conf
+if [ "$path" = "/" ]; then path_sed=""; else path_sed="$path"; fi
+sed "s|__PATH__|$path_sed|g; s|__INSTALL_DIR__|$install_dir|g" ../conf/nginx.conf \
+  > /etc/nginx/conf.d/$domain.d/$app.conf
+chown root:www-data /etc/nginx/conf.d/${app}_gate_map.conf /etc/nginx/conf.d/$domain.d/$app.conf
+
+ynh_systemctl --service=nginx --action="reload"
+
+ynh_script_progression "Upgrade of $app completed"

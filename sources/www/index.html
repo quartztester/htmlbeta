@@ -1,0 +1,524 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Zen</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,500;1,6..96,500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0a;
+  --surface: #141414;
+  --ink: #efefef;
+  --muted: #9a9a9a;
+  --accent: #b11226;
+  --step-small: clamp(0.8125rem, 0.79rem + 0.1vw, 0.875rem);
+  --step-body: clamp(1.0625rem, 1rem + 0.25vw, 1.1875rem);
+  --step-lead: clamp(1.25rem, 1.1rem + 0.7vw, 1.625rem);
+  --step-head: clamp(2rem, 1.3rem + 3.2vw, 4rem);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { background: var(--bg); }
+body {
+  font-family: Jost, system-ui, sans-serif;
+  color: var(--ink);
+  background: var(--bg);
+  font-weight: 300;
+  letter-spacing: 0.01em;
+}
+img { display: block; }
+button, input { font: inherit; color: inherit; }
+
+/* ============ LOCK SCREEN ============ */
+#lock {
+  position: fixed; inset: 0;
+  background: var(--bg);
+  display: grid;
+  grid-template-rows: 1fr auto;
+  z-index: 10;
+}
+#lock .wordmark {
+  font-family: "Bodoni Moda", serif;
+  font-weight: 500;
+  font-size: clamp(88px, 20vw, 300px);
+  line-height: 0.9;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  text-align: center;
+  align-self: center;
+  padding: 0 16px;
+  user-select: none;
+}
+#lock form {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 14px; padding-bottom: 14vh;
+}
+#lock input {
+  background: transparent;
+  border: 0; border-radius: 0;
+  border-bottom: 2px solid var(--muted);
+  color: var(--ink);
+  font-family: "Bodoni Moda", serif;
+  font-size: var(--step-lead);
+  text-align: center;
+  padding: 10px 18px;
+  width: min(280px, 70vw);
+  outline: none;
+  transition: border-color 0.25s ease;
+}
+#lock input:focus { border-color: var(--ink); }
+#lock input::placeholder { color: var(--muted); opacity: 1; }
+#lock.shake form { animation: shake 0.4s ease; }
+@keyframes shake {
+  20% { transform: translateX(-10px); }
+  40% { transform: translateX(8px); }
+  60% { transform: translateX(-6px); }
+  80% { transform: translateX(4px); }
+}
+#lock .dot-hint {
+  display: flex; gap: 10px;
+}
+#lock .dot-hint span {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--muted);
+}
+@media (prefers-reduced-motion: reduce) {
+  #lock.shake form { animation: none; }
+}
+
+/* ============ GALLERY ============ */
+#site { display: none; }
+#site.open { display: block; }
+
+/* Hero — two prints in darkness */
+.hero {
+  position: relative;
+  min-height: 100svh;
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  padding: 30px;
+  gap: 0 16px;
+}
+.hero .print-main {
+  grid-column: 6 / 10;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  margin-top: 14vh;
+}
+.hero .print-small {
+  grid-column: 2 / 4;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  margin-top: 52vh;
+  filter: brightness(0.7);
+}
+.hero .nav {
+  position: fixed; top: 0; left: 0; right: 0;
+  display: flex; justify-content: space-between;
+  padding: 30px;
+  z-index: 5;
+  mix-blend-mode: normal;
+}
+.hero .nav .mark {
+  font-family: "Bodoni Moda", serif;
+  font-size: var(--step-body);
+  letter-spacing: 0.02em;
+}
+.hero .nav .mark em { font-style: italic; color: var(--accent); }
+.hero .headline {
+  position: absolute;
+  left: 30px; bottom: 30px;
+  font-family: "Bodoni Moda", serif;
+  font-weight: 500;
+  font-size: clamp(28px, 2.5vw, 40px);
+  line-height: 1.05;
+  max-width: 12ch;
+}
+.hero .sentence {
+  position: absolute;
+  right: 30px; bottom: 30px;
+  color: var(--muted);
+  font-size: 16px;
+  max-width: 24ch;
+  text-align: right;
+}
+
+/* Strips — the years */
+.strips { padding: 0 30px 120px; }
+.strip-row {
+  position: relative;
+  margin-bottom: 45px;
+}
+.strip-rail {
+  position: sticky; top: 90px;
+  float: left;
+  width: 13%;
+  padding-right: 20px;
+}
+.strip-rail .rail-name {
+  font-family: "Bodoni Moda", serif;
+  font-size: 28px; line-height: 1.1;
+  margin-bottom: 12px;
+}
+.strip-rail .filters { display: flex; flex-direction: column; gap: 6px; font-size: 15px; color: var(--muted); }
+.strip-rail .filters .on { color: var(--ink); }
+.strip {
+  display: flex; gap: 8px;
+  overflow: hidden;
+  margin-left: 13%;
+}
+.strip img {
+  height: 190px; width: auto;
+  flex: none;
+}
+.strip-row .caption {
+  display: flex; justify-content: space-between;
+  margin-left: 13%;
+  margin-top: 8px;
+  font-size: var(--step-small);
+  color: var(--muted);
+}
+.strip-row:hover { opacity: 1; }
+.strips:hover .strip-row { opacity: 0.4; transition: opacity 0.3s ease; }
+.strips:hover .strip-row:hover { opacity: 1; }
+
+/* Staggered gallery */
+.flow { padding: 20vh 30px; }
+.pair { display: grid; grid-template-columns: repeat(12, 1fr); margin-bottom: 26vh; }
+.pair img { width: 100%; object-fit: cover; }
+.pair .p1 { grid-column: 1 / 5; aspect-ratio: 3 / 4; }
+.pair .p2 { grid-column: 7 / 12; aspect-ratio: 5 / 4; margin-top: 30vh; }
+.pair.mirror .p1 { grid-column: 8 / 12; aspect-ratio: 3 / 4; }
+.pair.mirror .p2 { grid-column: 2 / 7; aspect-ratio: 3 / 2; margin-top: 24vh; }
+.pair .cap {
+  font-size: var(--step-small);
+  color: var(--muted);
+  margin-top: 10px;
+}
+.pair .p1wrap { grid-column: 1 / 5; }
+.pair .p2wrap { grid-column: 7 / 12; margin-top: 30vh; }
+.pair.mirror .p1wrap { grid-column: 8 / 12; }
+.pair.mirror .p2wrap { grid-column: 2 / 7; margin-top: 24vh; }
+
+/* Motion studies — the only two films ever made */
+.motion { padding: 10vh 30px 20vh; }
+.motion h3 {
+  font-family: "Bodoni Moda", serif;
+  font-weight: 500;
+  font-size: clamp(24px, 2.2vw, 34px);
+  margin-bottom: 6vh;
+}
+.motion .films { display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; }
+.motion video {
+  width: 100%; aspect-ratio: 16 / 9; object-fit: cover;
+  background: #000;
+}
+.motion .f1 { grid-column: 2 / 7; }
+.motion .f2 { grid-column: 8 / 12; margin-top: 8vh; }
+@media (max-width: 700px) {
+  .motion { padding: 6vh 16px; }
+  .motion .f1, .motion .f2 { grid-column: 1 / -1; margin-top: 0; }
+}
+
+/* About — inset panel */
+.about {
+  margin: 20px;
+  background: var(--surface);
+  padding: 56px;
+  position: relative;
+  overflow: hidden;
+  min-height: 110svh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+.about .statement {
+  grid-column: 1;
+  font-family: "Bodoni Moda", serif;
+  font-weight: 500;
+  font-size: clamp(40px, 4.4vw, 64px);
+  line-height: 1.0;
+  max-width: 10ch;
+}
+.about .portrait {
+  position: absolute;
+  bottom: -12%;
+  left: 4vw;
+  width: 38vw;
+  clip-path: circle(46% at 50% 50%);
+}
+.about .facts {
+  grid-column: 2;
+  justify-self: end;
+  width: min(300px, 100%);
+  display: flex; flex-direction: column; gap: 64px;
+}
+.about .facts .fact h3 { font-size: 22px; font-weight: 400; margin-bottom: 10px; }
+.about .facts .fact p { font-size: 15px; line-height: 1.6; color: var(--muted); }
+.about .facts svg { width: 100%; height: auto; display: block; margin-top: 8px; }
+
+/* Footer — name across the last photograph */
+.footer { position: relative; height: 100svh; overflow: hidden; }
+.footer .photo {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  filter: brightness(0.62);
+}
+.footer .topline {
+  position: absolute; top: 32px; left: 30px; right: 30px;
+  display: flex; justify-content: space-between;
+  font-size: 16px;
+  color: var(--ink);
+}
+.footer .topline .links { display: flex; gap: 18px; }
+.footer .wordmark {
+  position: absolute; left: 0; right: 0; bottom: 56px;
+  font-family: "Bodoni Moda", serif;
+  font-weight: 500;
+  text-transform: uppercase;
+  text-align: center;
+  font-size: clamp(120px, 26vw, 520px);
+  line-height: 0.82;
+  color: #f5f2ea;
+  letter-spacing: -0.02em;
+  pointer-events: none;
+}
+
+/* Motion */
+.reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.7s ease, transform 0.7s ease; }
+.reveal.in { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; transition: none; }
+}
+
+/* Phone */
+@media (max-width: 700px) {
+  .hero { padding: 16px; }
+  .hero .print-main { grid-column: 3 / 13; margin-top: 12vh; }
+  .hero .print-small { grid-column: 1 / 6; margin-top: 34vh; filter: brightness(0.7); }
+  .hero .headline { left: 16px; bottom: 16px; font-size: 6.4vw; }
+  .hero .sentence { right: 16px; bottom: 16px; font-size: 15px; }
+  .hero .nav { padding: 16px; }
+  .strips { padding: 0 16px 90px; }
+  .strip-rail { float: none; width: auto; display: flex; justify-content: space-between; align-items: baseline; position: static; margin-bottom: 14px; }
+  .strip-rail .filters { flex-direction: row; }
+  .strip { margin-left: 0; overflow-x: auto; scroll-snap-type: x mandatory; }
+  .strip img { height: 120px; scroll-snap-align: start; }
+  .strip-row .caption { margin-left: 0; }
+  .flow { padding: 12vh 16px; }
+  .pair, .pair.mirror { display: block; }
+  .pair img { margin-top: 0 !important; }
+  .pair .p1wrap, .pair .p2wrap, .pair.mirror .p1wrap, .pair.mirror .p2wrap { margin-top: 0; margin-bottom: 64px; }
+  .pair .p1wrap img { width: 70%; }
+  .pair .p2wrap img { width: 84%; margin-left: auto; }
+  .about { margin: 10px; padding: 28px; display: block; min-height: auto; }
+  .about .facts { width: 100%; margin-top: 48px; gap: 40px; }
+  .about .portrait { position: static; width: 86vw; margin: 48px auto 0; display: block; }
+  .footer { height: 88svh; }
+  .footer .topline { flex-direction: column; gap: 8px; top: 20px; left: 16px; }
+}
+</style>
+</head>
+<body>
+
+<!-- THE LOCK: the name is the hint; the name is the password -->
+<div id="lock">
+  <div class="wordmark" aria-hidden="true">ZEN</div>
+  <form id="gate" autocomplete="off">
+    <input id="pw" type="password" placeholder="·" aria-label="Password" autofocus>
+    <div class="dot-hint" aria-hidden="true"><span></span><span></span><span></span></div>
+  </form>
+</div>
+
+<!-- THE GALLERY -->
+<div id="site">
+  <header class="hero">
+    <nav class="nav">
+      <div class="mark">Z<em>e</em>n</div>
+      <div class="links" style="display:flex;gap:18px;font-size:15px;">
+        <a href="#years" style="color:inherit;text-decoration:none;">I · II</a>
+      </div>
+    </nav>
+    <img class="print-main reveal" src="photos/8b809fd52ac9.jpg" alt="Zen, wide-eyed on the sofa in red light" width="960" height="1200">
+    <img class="print-small reveal" src="photos/01adbedd00bc.jpg" alt="Zen resting" width="480" height="480" loading="lazy">
+    <h1 class="headline reveal">a&nbsp;serious&nbsp;cat</h1>
+    <p class="sentence reveal">fifty-seven photographs of one animal doing almost nothing, presented like it matters.</p>
+  </header>
+
+  <section class="strips" id="years">
+    <div class="strip-rail">
+      <div class="rail-name">the&nbsp;years</div>
+      <div class="filters">
+        <span class="on">all</span>
+        <span>asleep</span>
+        <span>awake</span>
+      </div>
+    </div>
+    <!-- strips injected -->
+  </section>
+
+  <section class="flow" id="flow">
+    <!-- staggered pairs injected -->
+  </section>
+
+  <section class="motion" id="motion">
+    <h3 class="reveal">motion&nbsp;studies</h3>
+    <div class="films">
+      <video class="f1 reveal" controls playsinline preload="metadata" muted loop></video>
+      <video class="f2 reveal" controls playsinline preload="metadata" muted loop></video>
+    </div>
+  </section>
+
+  <section class="about">
+    <h2 class="statement reveal">master&nbsp;of&nbsp;the&nbsp;house</h2>
+    <img class="portrait reveal" src="photos/bf74383deaa7.jpg" alt="Zen in the sink" width="900" height="1200" loading="lazy">
+    <div class="facts">
+      <div class="fact reveal">
+        <h3>asleep</h3>
+        <p id="stat-asleep">—</p>
+        <svg viewBox="0 0 300 24" role="img" aria-label="Proportion asleep"><rect id="bar-asleep" width="0" height="24" fill="#b11226"></svg>
+      </div>
+      <div class="fact reveal">
+        <h3>boxes</h3>
+        <p id="stat-boxes">—</p>
+        <svg viewBox="0 0 300 24" role="img" aria-label="Sinks occupied"><rect id="bar-boxes" width="0" height="24" fill="#b11226"></svg>
+      </div>
+      <div class="fact reveal">
+        <h3>the muse</h3>
+        <p>fluffy · ginger · unmoved</p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <img class="photo" src="photos/1a7af8448b93.jpg" alt="Zen asleep against a blanket" loading="lazy">
+    <div class="topline">
+      <div class="links"><a href="#top" style="color:inherit;text-decoration:none;">↑</a></div>
+      <div>zen.erikmakela.com</div>
+    </div>
+    <div class="wordmark">ZEN</div>
+  </footer>
+</div>
+
+<script>
+(async () => {
+  const data = await fetch('site.json').then(r => r.json()).catch(() => null);
+  const SITE_HASH = "92e4accd3d41d63fe7698c06c990e5a78916d6df";
+  const COOKIE = 'zen_key';
+  // lock
+  const lock = document.getElementById('lock');
+  const form = document.getElementById('gate');
+  const input = document.getElementById('pw');
+  async function sha(s) {
+    const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
+    return [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, '0')).join('').slice(0, 40);
+  }
+  async function tryOpen(e) {
+    e.preventDefault();
+    const h = await sha(input.value);
+    if (h === SITE_HASH) {
+      document.cookie = COOKIE + '=' + h + ';path=/;max-age=86400;samesite=lax';
+      openSite();
+      // images that error'd (403) while the lock was up need a fresh fetch
+      document.querySelectorAll('img').forEach(i => { const s = i.src; i.src = ''; i.src = s; });
+      document.querySelectorAll('video').forEach(v => v.load());
+    } else {
+      lock.classList.remove('shake');
+      void lock.offsetWidth;
+      lock.classList.add('shake');
+      input.value = '';
+      input.focus();
+    }
+  }
+  function openSite() {
+    lock.style.display = 'none';
+    document.getElementById('site').classList.add('open');
+    requestAnimationFrame(() => document.querySelectorAll('.reveal').forEach(el => el.classList.add('in')));
+  }
+  form.addEventListener('submit', tryOpen);
+  // already authed?
+  (async () => {
+    const m = document.cookie.match(new RegExp(COOKIE + '=([a-f0-9]+)'));
+    if (m && m[1] === SITE_HASH) openSite();
+  })();
+
+  if (!data) return;
+  // inject strips (group photos by year from captions)
+  const byYear = {};
+  data.gallery.concat([data.hero_main, data.hero_small]).forEach((p, i) => {
+    const cap = data.captions && data.captions[p];
+    const y = cap ? cap.split('·').pop().trim() : '2026';
+    (byYear[y] = byYear[y] || []).push(p);
+  });
+  const strips = document.querySelector('.strips');
+  Object.keys(byYear).sort().forEach(y => {
+    const row = document.createElement('div');
+    row.className = 'strip-row reveal';
+    const strip = document.createElement('div');
+    strip.className = 'strip';
+    byYear[y].forEach(p => {
+      const img = document.createElement('img');
+      img.src = 'photos/' + p; img.loading = 'lazy'; img.alt = 'Zen';
+      strip.appendChild(img);
+    });
+    const cap = document.createElement('div');
+    cap.className = 'caption';
+    const cnt = byYear[y].length;
+    cap.innerHTML = '<span>' + y + '</span><span>' + cnt + (cnt === 1 ? ' print' : ' prints') + '</span><span>' + y + '</span>';
+    row.appendChild(strip); row.appendChild(cap);
+    strips.appendChild(row);
+  });
+
+  // staggered pairs
+  const flow = document.querySelector('.flow');
+  const gal = data.gallery;
+  for (let i = 0; i + 1 < gal.length || i < gal.length; i += 2) {
+    const pair = document.createElement('div');
+    pair.className = 'pair reveal' + ((i / 2) % 2 ? ' mirror' : '');
+    const w1 = document.createElement('div'); w1.className = 'p1wrap';
+    const im1 = document.createElement('img'); im1.src = 'photos/' + gal[i]; im1.loading = 'lazy'; im1.alt = 'Zen';
+    w1.appendChild(im1);
+    const c1 = document.createElement('div'); c1.className = 'cap'; c1.textContent = (data.captions && data.captions[gal[i]]) || '';
+    w1.appendChild(c1);
+    pair.appendChild(w1);
+    if (i + 1 < gal.length) {
+      const w2 = document.createElement('div'); w2.className = 'p2wrap';
+      const im2 = document.createElement('img'); im2.src = 'photos/' + gal[i + 1]; im2.loading = 'lazy'; im2.alt = 'Zen';
+      w2.appendChild(im2);
+      const c2 = document.createElement('div'); c2.className = 'cap'; c2.textContent = (data.captions && data.captions[gal[i + 1]]) || '';
+      w2.appendChild(c2);
+      pair.appendChild(w2);
+    }
+    flow.appendChild(pair);
+  }
+
+  // motion studies
+  const vids = document.querySelectorAll('.motion video');
+  (data.videos || []).forEach((v, i) => {
+    if (vids[i]) { vids[i].src = 'clips/' + v; vids[i].load(); }
+  });
+
+  // scroll reveals
+  const io = new IntersectionObserver(es => es.forEach(en => {
+    if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); }
+  }), { threshold: 0.15 });
+  document.querySelectorAll('.reveal:not(.in)').forEach(el => io.observe(el));
+
+  // the live thing: asleep / awake meters (wordless humor — a stats dashboard for a cat)
+  const asleep = gal.length;
+  document.getElementById('stat-asleep').textContent = asleep + ' of ' + (asleep + 2) + ' photographs';
+  document.getElementById('stat-boxes').textContent = '1 sink, occupied';
+  setTimeout(() => {
+    document.getElementById('bar-asleep').setAttribute('width', Math.round(300 * asleep / (asleep + 2)));
+    document.getElementById('bar-boxes').setAttribute('width', 300);
+  }, 400);
+})();
+</script>
+</body>
+</html>
