@@ -7,7 +7,7 @@ name = "htmlbeta"
 description.en = "Zen — a photographic retrospective. Public gallery with a password gate (no YunoHost login)."
 description.fr = "Zen — une rétrospective photographique. Galerie publique avec mot de passe (sans compte YunoHost)."
 
-version = "1.0~ynh7"
+version = "1.0~ynh8"
 
 maintainers = ["quartztester"]
 

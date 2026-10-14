@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0a0a0a">
 <title>Zen</title>
 <meta name="robots" content="noindex">
 <link rel="icon" href="data:,">
@@ -16,10 +17,10 @@
   --ink: #efefef;
   --muted: #9a9a9a;
   --accent: #b11226;
+  --pad: 16px;
   --step-small: clamp(0.8125rem, 0.79rem + 0.1vw, 0.875rem);
   --step-body: clamp(1.0625rem, 1rem + 0.25vw, 1.1875rem);
   --step-lead: clamp(1.25rem, 1.1rem + 0.7vw, 1.625rem);
-  --step-head: clamp(2rem, 1.3rem + 3.2vw, 4rem);
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
 html { background: var(--bg); }
@@ -29,11 +30,13 @@ body {
   background: var(--bg);
   font-weight: 300;
   letter-spacing: 0.01em;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
 }
 img { display: block; }
 button, input { font: inherit; color: inherit; }
 
-/* ============ LOCK SCREEN ============ */
+/* ============ LOCK (all sizes) ============ */
 #lock {
   position: fixed; inset: 0;
   background: var(--bg);
@@ -44,18 +47,19 @@ button, input { font: inherit; color: inherit; }
 #lock .wordmark {
   font-family: "Bodoni Moda", serif;
   font-weight: 500;
-  font-size: clamp(88px, 20vw, 300px);
+  font-size: clamp(96px, 26vw, 320px);
   line-height: 0.9;
   letter-spacing: -0.02em;
   text-transform: uppercase;
   text-align: center;
   align-self: center;
-  padding: 0 16px;
+  padding: 0 var(--pad);
   user-select: none;
 }
 #lock form {
   display: flex; flex-direction: column; align-items: center;
-  gap: 14px; padding-bottom: 14vh;
+  gap: 14px;
+  padding-bottom: max(14vh, env(safe-area-inset-bottom));
 }
 #lock input {
   background: transparent;
@@ -79,211 +83,117 @@ button, input { font: inherit; color: inherit; }
   60% { transform: translateX(-6px); }
   80% { transform: translateX(4px); }
 }
-#lock .dot-hint {
-  display: flex; gap: 10px;
-}
-#lock .dot-hint span {
-  width: 10px; height: 10px; border-radius: 50%;
-  background: var(--muted);
-}
-@media (prefers-reduced-motion: reduce) {
-  #lock.shake form { animation: none; }
-}
+#lock .dot-hint { display: flex; gap: 10px; }
+#lock .dot-hint span { width: 10px; height: 10px; border-radius: 50%; background: var(--muted); }
 
-/* ============ GALLERY ============ */
+/* ============ GALLERY — mobile first ============ */
 #site { display: none; }
 #site.open { display: block; }
 
-/* Hero — two prints in darkness */
-.hero {
-  position: relative;
-  min-height: 100svh;
-  display: grid;
-  grid-template-columns: repeat(12, 1fr);
-  padding: 30px;
-  gap: 0 16px;
-}
-.hero .print-main {
-  grid-column: 6 / 10;
-  width: 100%;
-  aspect-ratio: 4 / 5;
-  object-fit: cover;
-  margin-top: 14vh;
-}
-.hero .print-small {
-  grid-column: 2 / 4;
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  object-fit: cover;
-  margin-top: 52vh;
-  filter: brightness(0.7);
-}
+/* Hero: flowing column on phones */
+.hero { position: relative; padding: 0 var(--pad) 48px; }
 .hero .nav {
   position: fixed; top: 0; left: 0; right: 0;
-  display: flex; justify-content: space-between;
-  padding: 30px;
+  display: flex; justify-content: space-between; align-items: baseline;
+  padding: max(18px, env(safe-area-inset-top)) var(--pad) 0;
   z-index: 5;
-  mix-blend-mode: normal;
 }
-.hero .nav .mark {
-  font-family: "Bodoni Moda", serif;
-  font-size: var(--step-body);
-  letter-spacing: 0.02em;
-}
+.hero .nav .mark { font-family: "Bodoni Moda", serif; font-size: var(--step-body); letter-spacing: 0.02em; }
 .hero .nav .mark em { font-style: italic; color: var(--accent); }
+.hero .nav .links { display: flex; gap: 18px; font-size: 15px; }
+.hero .print-main { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; margin-top: 12vh; }
+.hero .print-small {
+  width: 52%; aspect-ratio: 1 / 1; object-fit: cover;
+  margin: -14% 0 0 auto;
+  filter: brightness(0.7);
+  position: relative;
+}
 .hero .headline {
-  position: absolute;
-  left: 30px; bottom: 30px;
   font-family: "Bodoni Moda", serif;
   font-weight: 500;
-  font-size: clamp(28px, 2.5vw, 40px);
-  line-height: 1.05;
+  font-size: clamp(30px, 9vw, 44px);
+  line-height: 1.02;
+  margin-top: 30px;
   max-width: 12ch;
 }
 .hero .sentence {
-  position: absolute;
-  right: 30px; bottom: 30px;
   color: var(--muted);
-  font-size: 16px;
-  max-width: 24ch;
-  text-align: right;
+  font-size: 15px;
+  line-height: 1.55;
+  margin-top: 14px;
+  max-width: 30ch;
 }
 
-/* Strips — the years */
-.strips { padding: 0 30px 120px; }
-.strip-row {
-  position: relative;
-  margin-bottom: 45px;
-}
-.strip-rail {
-  position: sticky; top: 90px;
-  float: left;
-  width: 13%;
-  padding-right: 20px;
-}
-.strip-rail .rail-name {
-  font-family: "Bodoni Moda", serif;
-  font-size: 28px; line-height: 1.1;
-  margin-bottom: 12px;
-}
-.strip-rail .filters { display: flex; flex-direction: column; gap: 6px; font-size: 15px; color: var(--muted); }
+/* Strips: horizontal scroll-snap on phones */
+.strips { padding: 0 var(--pad) 90px; }
+.strip-rail { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 14px; }
+.strip-rail .rail-name { font-family: "Bodoni Moda", serif; font-size: 22px; line-height: 1.1; }
+.strip-rail .filters { display: flex; gap: 12px; font-size: 14px; color: var(--muted); }
 .strip-rail .filters .on { color: var(--ink); }
 .strip {
   display: flex; gap: 8px;
-  overflow: hidden;
-  margin-left: 13%;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
 }
-.strip img {
-  height: 190px; width: auto;
-  flex: none;
-}
-.strip-row .caption {
-  display: flex; justify-content: space-between;
-  margin-left: 13%;
-  margin-top: 8px;
-  font-size: var(--step-small);
-  color: var(--muted);
-}
-.strip-row:hover { opacity: 1; }
-.strips:hover .strip-row { opacity: 0.4; transition: opacity 0.3s ease; }
-.strips:hover .strip-row:hover { opacity: 1; }
+.strip::-webkit-scrollbar { display: none; }
+.strip img { height: 120px; width: auto; flex: none; scroll-snap-align: start; }
+.strip-row .caption { display: flex; justify-content: space-between; margin-top: 8px; font-size: var(--step-small); color: var(--muted); }
 
-/* Staggered gallery */
-.flow { padding: 20vh 30px; }
-.pair { display: grid; grid-template-columns: repeat(12, 1fr); margin-bottom: 26vh; }
-.pair img { width: 100%; object-fit: cover; }
-.pair .p1 { grid-column: 1 / 5; aspect-ratio: 3 / 4; }
-.pair .p2 { grid-column: 7 / 12; aspect-ratio: 5 / 4; margin-top: 30vh; }
-.pair.mirror .p1 { grid-column: 8 / 12; aspect-ratio: 3 / 4; }
-.pair.mirror .p2 { grid-column: 2 / 7; aspect-ratio: 3 / 2; margin-top: 24vh; }
-.pair .cap {
-  font-size: var(--step-small);
-  color: var(--muted);
-  margin-top: 10px;
-}
-.pair .p1wrap { grid-column: 1 / 5; }
-.pair .p2wrap { grid-column: 7 / 12; margin-top: 30vh; }
-.pair.mirror .p1wrap { grid-column: 8 / 12; }
-.pair.mirror .p2wrap { grid-column: 2 / 7; margin-top: 24vh; }
+/* Staggered pairs: asymmetric stack on phones */
+.flow { padding: 12vh var(--pad); }
+.pair { margin-bottom: 64px; }
+.pair .p1wrap img { width: 72%; }
+.pair .p2wrap { margin-top: 48px; }
+.pair .p2wrap img { width: 86%; margin-left: auto; }
+.pair .cap { font-size: var(--step-small); color: var(--muted); margin-top: 10px; }
 
-/* Motion studies — the only two films ever made */
-.motion { padding: 10vh 30px 20vh; }
+/* Motion studies: full-width films on phones */
+.motion { padding: 8vh var(--pad) 14vh; }
 .motion h3 {
   font-family: "Bodoni Moda", serif;
   font-weight: 500;
-  font-size: clamp(24px, 2.2vw, 34px);
-  margin-bottom: 6vh;
+  font-size: clamp(24px, 7vw, 34px);
+  margin-bottom: 5vh;
 }
-.motion .films { display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; }
-.motion video {
-  width: 100%; aspect-ratio: 16 / 9; object-fit: cover;
-  background: #000;
-}
-.motion .f1 { grid-column: 2 / 7; }
-.motion .f2 { grid-column: 8 / 12; margin-top: 8vh; }
-@media (max-width: 700px) {
-  .motion { padding: 6vh 16px; }
-  .motion .f1, .motion .f2 { grid-column: 1 / -1; margin-top: 0; }
-}
+.motion .films { display: grid; gap: 40px; }
+.motion video { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: #000; }
 
-/* About — inset panel */
-.about {
-  margin: 20px;
-  background: var(--surface);
-  padding: 56px;
-  position: relative;
-  overflow: hidden;
-  min-height: 110svh;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-}
+/* About: flowing panel on phones */
+.about { margin: 10px; background: var(--surface); padding: 28px; position: relative; overflow: hidden; }
 .about .statement {
-  grid-column: 1;
   font-family: "Bodoni Moda", serif;
   font-weight: 500;
-  font-size: clamp(40px, 4.4vw, 64px);
-  line-height: 1.0;
+  font-size: clamp(36px, 11vw, 56px);
+  line-height: 1;
   max-width: 10ch;
 }
-.about .portrait {
-  position: absolute;
-  bottom: -12%;
-  left: 4vw;
-  width: 38vw;
-  clip-path: circle(46% at 50% 50%);
-}
-.about .facts {
-  grid-column: 2;
-  justify-self: end;
-  width: min(300px, 100%);
-  display: flex; flex-direction: column; gap: 64px;
-}
-.about .facts .fact h3 { font-size: 22px; font-weight: 400; margin-bottom: 10px; }
+.about .portrait { width: 78vw; margin: 40px auto 0; clip-path: circle(46% at 50% 50%); }
+.about .facts { display: flex; flex-direction: column; gap: 40px; margin-top: 48px; }
+.about .facts .fact h3 { font-size: 20px; font-weight: 400; margin-bottom: 8px; }
 .about .facts .fact p { font-size: 15px; line-height: 1.6; color: var(--muted); }
 .about .facts svg { width: 100%; height: auto; display: block; margin-top: 8px; }
 
-/* Footer — name across the last photograph */
-.footer { position: relative; height: 100svh; overflow: hidden; }
-.footer .photo {
-  position: absolute; inset: 0;
-  width: 100%; height: 100%;
-  object-fit: cover;
-  filter: brightness(0.62);
-}
+/* Footer */
+.footer { position: relative; height: 88vh; height: 88svh; overflow: hidden; }
+.footer .photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: brightness(0.62); }
 .footer .topline {
-  position: absolute; top: 32px; left: 30px; right: 30px;
-  display: flex; justify-content: space-between;
-  font-size: 16px;
-  color: var(--ink);
+  position: absolute;
+  top: max(20px, env(safe-area-inset-top));
+  left: var(--pad); right: var(--pad);
+  display: flex; flex-direction: column; gap: 8px;
+  font-size: 15px;
 }
 .footer .topline .links { display: flex; gap: 18px; }
 .footer .wordmark {
-  position: absolute; left: 0; right: 0; bottom: 56px;
+  position: absolute; left: 0; right: 0;
+  bottom: max(48px, env(safe-area-inset-bottom));
   font-family: "Bodoni Moda", serif;
   font-weight: 500;
   text-transform: uppercase;
   text-align: center;
-  font-size: clamp(120px, 26vw, 520px);
+  font-size: clamp(96px, 30vw, 520px);
   line-height: 0.82;
   color: #f5f2ea;
   letter-spacing: -0.02em;
@@ -295,33 +205,75 @@ button, input { font: inherit; color: inherit; }
 .reveal.in { opacity: 1; transform: none; }
 @media (prefers-reduced-motion: reduce) {
   .reveal { opacity: 1; transform: none; transition: none; }
+  #lock.shake form { animation: none; }
 }
 
-/* Phone */
-@media (max-width: 700px) {
-  .hero { padding: 16px; }
-  .hero .print-main { grid-column: 3 / 13; margin-top: 12vh; }
-  .hero .print-small { grid-column: 1 / 6; margin-top: 34vh; filter: brightness(0.7); }
-  .hero .headline { left: 16px; bottom: 16px; font-size: 6.4vw; }
-  .hero .sentence { right: 16px; bottom: 16px; font-size: 15px; }
-  .hero .nav { padding: 16px; }
-  .strips { padding: 0 16px 90px; }
-  .strip-rail { float: none; width: auto; display: flex; justify-content: space-between; align-items: baseline; position: static; margin-bottom: 14px; }
-  .strip-rail .filters { flex-direction: row; }
-  .strip { margin-left: 0; overflow-x: auto; scroll-snap-type: x mandatory; }
-  .strip img { height: 120px; scroll-snap-align: start; }
-  .strip-row .caption { margin-left: 0; }
-  .flow { padding: 12vh 16px; }
-  .pair, .pair.mirror { display: block; }
-  .pair img { margin-top: 0 !important; }
-  .pair .p1wrap, .pair .p2wrap, .pair.mirror .p1wrap, .pair.mirror .p2wrap { margin-top: 0; margin-bottom: 64px; }
-  .pair .p1wrap img { width: 70%; }
-  .pair .p2wrap img { width: 84%; margin-left: auto; }
-  .about { margin: 10px; padding: 28px; display: block; min-height: auto; }
-  .about .facts { width: 100%; margin-top: 48px; gap: 40px; }
-  .about .portrait { position: static; width: 86vw; margin: 48px auto 0; display: block; }
-  .footer { height: 88svh; }
-  .footer .topline { flex-direction: column; gap: 8px; top: 20px; left: 16px; }
+/* ============ DESKTOP (min-width 701px) ============ */
+@media (min-width: 701px) {
+  :root { --pad: 30px; }
+
+  .hero {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 0 16px;
+    min-height: 100vh; min-height: 100svh;
+    padding: 30px;
+  }
+  .hero .print-main { grid-column: 6 / 10; margin-top: 14vh; }
+  .hero .print-small { grid-column: 2 / 4; width: 100%; margin: 52vh 0 0; }
+  .hero .headline { position: absolute; left: 30px; bottom: 30px; margin: 0; font-size: clamp(28px, 2.5vw, 40px); }
+  .hero .sentence { position: absolute; right: 30px; bottom: 30px; margin: 0; text-align: right; max-width: 24ch; }
+
+  .strips { padding: 0 30px 120px; }
+  .strip-rail {
+    position: sticky; top: 90px;
+    float: left;
+    width: 13%;
+    display: block;
+    padding-right: 20px;
+    margin-bottom: 0;
+  }
+  .strip-rail .rail-name { font-size: 28px; margin-bottom: 12px; }
+  .strip-rail .filters { flex-direction: column; gap: 6px; font-size: 15px; }
+  .strip { margin-left: 13%; overflow: hidden; }
+  .strip img { height: 190px; }
+  .strip-row .caption { margin-left: 13%; }
+  .strips:hover .strip-row { opacity: 0.4; transition: opacity 0.3s ease; }
+  .strips:hover .strip-row:hover { opacity: 1; }
+
+  .flow { padding: 20vh 30px; }
+  .pair { display: grid; grid-template-columns: repeat(12, 1fr); margin-bottom: 26vh; }
+  .pair .p1wrap { grid-column: 1 / 5; }
+  .pair .p2wrap { grid-column: 7 / 12; margin-top: 30vh; }
+  .pair.mirror .p1wrap { grid-column: 8 / 12; }
+  .pair.mirror .p2wrap { grid-column: 2 / 7; margin-top: 24vh; }
+  .pair .p1wrap img, .pair .p2wrap img { width: 100%; }
+  .pair .p1wrap img { aspect-ratio: 3 / 4; object-fit: cover; }
+  .pair .p2wrap img { aspect-ratio: 5 / 4; object-fit: cover; }
+  .pair.mirror .p1wrap img { aspect-ratio: 3 / 4; object-fit: cover; }
+  .pair.mirror .p2wrap img { aspect-ratio: 3 / 2; object-fit: cover; }
+
+  .motion { padding: 10vh 30px 20vh; }
+  .motion h3 { font-size: clamp(24px, 2.2vw, 34px); margin-bottom: 6vh; }
+  .motion .films { grid-template-columns: repeat(12, 1fr); gap: 16px; }
+  .motion .f1 { grid-column: 2 / 7; }
+  .motion .f2 { grid-column: 8 / 12; margin-top: 8vh; }
+
+  .about {
+    margin: 20px;
+    padding: 56px;
+    min-height: 110vh; min-height: 110svh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .about .statement { font-size: clamp(40px, 4.4vw, 64px); }
+  .about .portrait { position: absolute; bottom: -12%; left: 4vw; width: 38vw; margin: 0; }
+  .about .facts { grid-column: 2; justify-self: end; width: min(300px, 100%); gap: 64px; margin-top: 0; }
+  .about .facts .fact h3 { font-size: 22px; }
+
+  .footer { height: 100vh; height: 100svh; }
+  .footer .topline { flex-direction: row; justify-content: space-between; top: 32px; left: 30px; right: 30px; }
+  .footer .wordmark { font-size: clamp(120px, 26vw, 520px); bottom: 56px; }
 }
 </style>
 </head>
